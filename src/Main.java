@@ -31,6 +31,7 @@ public class Main {
 
         map.put("mv", ShellVerbs::moveFile);
         map.put("cp", ShellVerbs::copyFile);
+        map.put("rm",ShellVerbs::deleteFile);
     }
 
 
