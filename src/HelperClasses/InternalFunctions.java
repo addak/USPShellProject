@@ -23,8 +23,8 @@ public class InternalFunctions {
         else while(i < input.length() && input.charAt(i) != ' ')
             sb.append(input.charAt(i++));
         sourceFilePath = sb.toString();
-        if(sourceFilePath.charAt(1) != ':')
-            sourceFilePath = InternalState.getInstance().getPresentWorkingDirectory().toString() + '\\' + sb.toString();
+        if(sourceFilePath.charAt(0) != '/')
+            sourceFilePath = InternalState.getInstance().getPresentWorkingDirectory().toString() + '/' + sb.toString();
         sb = new StringBuilder();
         ++i;
 
@@ -37,8 +37,8 @@ public class InternalFunctions {
             while(i < input.length() && input.charAt(i) != ' ')
                 sb.append(input.charAt(i++));
         destinationFilePath = sb.toString();
-        if(destinationFilePath.charAt(1) != ':')
-            destinationFilePath = InternalState.getInstance().getPresentWorkingDirectory().toString() + '\\' + sb.toString();
+        if(destinationFilePath.charAt(0) != '/')
+            destinationFilePath = InternalState.getInstance().getPresentWorkingDirectory().toString() + '/' + sb.toString();
         String[] paths = {sourceFilePath, destinationFilePath};
         return paths;
     }

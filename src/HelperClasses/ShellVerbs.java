@@ -27,10 +27,15 @@ public class ShellVerbs {
     public static Object clearScreen(String[] params) throws IOException {
         //Doesn't work in IntelliJ's console but
         //it should work in a regular cmd window
-        try{
-            new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
-            System.out.println();
-        } catch (Exception e) {}
+        /*
+            Windows version of this code, no longer used
+            try{
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+                System.out.println();
+            } catch (Exception e) {}
+         */
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
         return null;
     }
 
@@ -49,8 +54,8 @@ public class ShellVerbs {
                 InternalState.getInstance().setPresentWorkingDirectory(pwd.getParent());
         }
         else {
-            if(params[0].charAt(1) != ':')
-                params[0] = InternalState.getInstance().getPresentWorkingDirectory().toString() + "\\" + params[0];
+            if(params[0].charAt(0) != '/')
+                params[0] = InternalState.getInstance().getPresentWorkingDirectory().toString() + "/" + params[0];
             Path destination = Paths.get(params[0]);
             if(Files.exists(destination))
                 InternalState.getInstance().setPresentWorkingDirectory(destination);
@@ -65,8 +70,8 @@ public class ShellVerbs {
             path = InternalState.getInstance().getPresentWorkingDirectory();
         }
         else {
-            if(values[0].charAt(1) != ':') {
-                values[0] = InternalState.getInstance().getPresentWorkingDirectory().toString() + "\\" + values[0];
+            if(values[0].charAt(0) != '/') {
+                values[0] = InternalState.getInstance().getPresentWorkingDirectory().toString() + "/" + values[0];
             }
             path = Paths.get(values[0]);
         }
@@ -157,7 +162,7 @@ public class ShellVerbs {
     }
 
     public static Void deleteFile(String[] values) throws IOException{
-        if(values[0].charAt(1) != ':')
+        if(values[0].charAt(0) != '/')
             values[0] = InternalState.getInstance().getPresentWorkingDirectory().toString() + '\\' + values[0];
         Path deleteFile = Paths.get(values[0]);
         if(Files.exists(deleteFile)) InternalFunctions.recursiveDelete(deleteFile);
