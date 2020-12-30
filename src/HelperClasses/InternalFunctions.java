@@ -102,22 +102,7 @@ public class InternalFunctions {
             List<Path> paths = Files.list(path).collect(Collectors.toList());
             for(Path childFile : paths) {
                 if(Files.isDirectory(childFile)) {
-                    recursivelyDeleteFolder(childFile);
-                }
-                else {
-                    Files.delete(childFile);
-                }
-            }
-            Files.delete(path);
-        } else if (Files.isRegularFile(path)) Files.delete(path);
-    }
-
-    public static void recursivelyDeleteFolder(Path path) throws IOException {
-        if(Files.isDirectory(path)) {
-            List<Path> paths = Files.list(path).collect(Collectors.toList());
-            for(Path childFile : paths) {
-                if(Files.isDirectory(childFile)) {
-                    recursivelyDeleteFolder(childFile);
+                    recursiveDelete(childFile);
                 }
                 else {
                     Files.delete(childFile);
