@@ -5,6 +5,7 @@ import java.nio.file.*;
 import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
+
 /**
  *  All the shell functions go here I guess
  *

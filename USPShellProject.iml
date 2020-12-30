@@ -13,5 +13,17 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="org.apache.directory.studio:org.apache.commons.io:2.4" level="project" />
     <orderEntry type="library" name="java" level="project" />
+    <orderEntry type="library" name="Maven: com.github.jnr:jnr-posix:3.1.4" level="project" />
+    <orderEntry type="library" name="Maven: com.github.jnr:jnr-ffi:2.2.1" level="project" />
+    <orderEntry type="library" name="Maven: com.github.jnr:jffi:1.3.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.github.jnr:jffi:native:1.3.1" level="project" />
+    <orderEntry type="library" name="Maven: org.ow2.asm:asm:9.0" level="project" />
+    <orderEntry type="library" name="Maven: org.ow2.asm:asm-commons:9.0" level="project" />
+    <orderEntry type="library" name="Maven: org.ow2.asm:asm-analysis:9.0" level="project" />
+    <orderEntry type="library" name="Maven: org.ow2.asm:asm-tree:9.0" level="project" />
+    <orderEntry type="library" name="Maven: org.ow2.asm:asm-util:9.0" level="project" />
+    <orderEntry type="library" name="Maven: com.github.jnr:jnr-a64asm:1.0.0" level="project" />
+    <orderEntry type="library" name="Maven: com.github.jnr:jnr-x86asm:1.0.2" level="project" />
+    <orderEntry type="library" name="Maven: com.github.jnr:jnr-constants:0.10.1" level="project" />
   </component>
 </module>
