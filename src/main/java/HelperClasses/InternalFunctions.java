@@ -39,8 +39,8 @@ public class InternalFunctions {
         destinationFilePath = sb.toString();
         if(destinationFilePath.charAt(0) != '/')
             destinationFilePath = InternalState.getInstance().getPresentWorkingDirectory().toString() + '/' + sb.toString();
-        String[] paths = {sourceFilePath, destinationFilePath};
-        return paths;
+
+        return new String[]{sourceFilePath, destinationFilePath};
     }
 
     public static void recursiveCopy(Path srcPath, Path desPath) throws IOException {
