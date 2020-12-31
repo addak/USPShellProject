@@ -1,3 +1,4 @@
+import HelperClasses.InternalState;
 import HelperClasses.ShellVerbs;
 import HelperClasses.VerbMapFunction;
 
@@ -26,6 +27,7 @@ public class Main {
     public static void main(String[] args) throws IOException {
 
         Scanner scanner = new Scanner(new BufferedReader(new InputStreamReader(System.in)));
+        InternalState.setScanner(scanner);
         while(true) {
             System.out.print(">> ");
             String command = scanner.next();
