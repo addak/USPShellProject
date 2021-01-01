@@ -3,6 +3,7 @@ package HelperClasses;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Pattern;
@@ -20,7 +21,7 @@ import java.util.stream.Collectors;
 
 public class ShellVerbs {
 
-    public static Object clearScreen(String[] params) {
+    public static Object clearScreen(ArrayList<String> parameters, ArrayList<String> arguments) {
         //Doesn't work in IntelliJ's console but
         //it should work in a regular cmd window
         /*
@@ -35,17 +36,17 @@ public class ShellVerbs {
         return null;
     }
 
-    public static Object presentWorkingDirectory(String[] params) {
+    public static Object presentWorkingDirectory(ArrayList<String> parameters, ArrayList<String> arguments) {
         System.out.println(Colour.GREEN
                 + InternalState.getInstance().getPresentWorkingDirectory().toString()
                 + Colour.RESET);
         return null;
     }
 
-    public static Object changeDirectory(String[] params){
-        if(params == null || params.length == 0 || params[0].equals("."))
+    public static Object changeDirectory(ArrayList<String> parameters, ArrayList<String> arguments){
+        if(arguments == null || arguments.size() == 0 || arguments.get(0).equals("."))
             return null;
-        else if (params[0].equals("..")) {
+        else if (arguments.get(0).equals("..")) {
 
             Path pwd = InternalState.getInstance().getPresentWorkingDirectory();
             if(pwd.getParent() != null)
@@ -53,17 +54,19 @@ public class ShellVerbs {
         }
         else {
             Pattern absPathPattern = Pattern.compile("^[A-Z]:.*");
-            if(params[0].startsWith("."+ File.separator)){
-                params[0] = InternalState.getInstance().getPresentWorkingDirectory().toString() + params[0].substring(1);
+            if(arguments.get(0).startsWith("."+ File.separator)){
+//                arguments.get(0) = InternalState.getInstance().getPresentWorkingDirectory().toString() + arguments.get(0).substring(1);
+                arguments.set(0, InternalState.getInstance().getPresentWorkingDirectory().toString() + arguments.get(0).substring(1));
             }
-            else if(params[0].startsWith(File.separator)){
+            else if(arguments.get(0).startsWith(File.separator)){
                 Path pwd = InternalState.getInstance().getPresentWorkingDirectory().getRoot();
-                params[0] = pwd.toString() + params[0].substring(1);
+//                arguments.get(0) = pwd.toString() + arguments.get(0).substring(1);
+                arguments.set(0, pwd.toString() + arguments.get(0).substring(1));
             }
-            else if(!absPathPattern.matcher(params[0]).matches())
-                params[0] = InternalState.getInstance().getPresentWorkingDirectory().toString() + "/" + params[0];
-
-            Path destination = Paths.get(params[0]);
+            else if(!absPathPattern.matcher(arguments.get(0)).matches())
+//                arguments.get(0) = InternalState.getInstance().getPresentWorkingDirectory().toString() + "/" + arguments.get(0);
+                arguments.set(0, InternalState.getInstance().getPresentWorkingDirectory().toString() + "/" + arguments.get(0));
+            Path destination = Paths.get(arguments.get(0));
             if(Files.exists(destination))
                 InternalState.getInstance().setPresentWorkingDirectory(destination);
             else System.out.println(Colour.RED + "Specified path can't be found." + Colour.RESET);
@@ -71,34 +74,46 @@ public class ShellVerbs {
         return null;
     }
 
-    public static Object listFiles(String[] params) throws IOException {
+    public static Object listFiles(ArrayList<String> parameters, ArrayList<String> arguments) throws IOException {
         Path path;
-        if(params[0].length() == 0 || params[0].equals(".")){
-            params[0] = InternalState.getInstance().getPresentWorkingDirectory().toString();
-        }
-        else if (params[0].equals("..")) {
+//        if(arguments.get(0).length() == 0 || arguments.get(0).equals(".")){
+////            arguments.get(0) = InternalState.getInstance().getPresentWorkingDirectory().toString();
+//            arguments.set(0, InternalState.getInstance().getPresentWorkingDirectory().toString());
+//        }
+        if(arguments.size() == 0)
+            arguments.add(InternalState.getInstance().getPresentWorkingDirectory().toString());
+        else if(arguments.get(0).equals("."))
+            arguments.set(0, InternalState.getInstance().getPresentWorkingDirectory().toString());
+        else if (arguments.get(0).equals("..")) {
 
             Path pwd = InternalState.getInstance().getPresentWorkingDirectory();
+//            if(pwd.getParent() != null)
+//                arguments.get(0) = pwd.getParent().toString();
             if(pwd.getParent() != null)
-                params[0] = pwd.getParent().toString();
+                arguments.set(0, pwd.getParent().toString());
+//            else
+//                arguments.get(0) = pwd.toString();
             else
-                params[0] = pwd.toString();
+                arguments.set(0, pwd.toString());
 
         }
         else{
             Pattern absPathPattern = Pattern.compile("^[A-Z]:.*");
-            if(params[0].startsWith("."+ File.separator)){
-                params[0] = InternalState.getInstance().getPresentWorkingDirectory().toString() + params[0].substring(1);
+            if(arguments.get(0).startsWith("."+ File.separator)){
+//                arguments.get(0) = InternalState.getInstance().getPresentWorkingDirectory().toString() + arguments.get(0).substring(1);
+                arguments.set(0, InternalState.getInstance().getPresentWorkingDirectory().toString() + arguments.get(0).substring(1));
             }
-            else if(params[0].startsWith(File.separator)){
+            else if(arguments.get(0).startsWith(File.separator)){
                 Path pwd = InternalState.getInstance().getPresentWorkingDirectory().getRoot();
-                params[0] = pwd.toString() + params[0].substring(1);
+//                arguments.get(0) = pwd.toString() + arguments.get(0).substring(1);
+                arguments.set(0, pwd.toString() + arguments.get(0).substring(1));
             }
-            else if(!absPathPattern.matcher(params[0]).matches())
-                params[0] = InternalState.getInstance().getPresentWorkingDirectory().toString() + "/" + params[0];
+            else if(!absPathPattern.matcher(arguments.get(0)).matches())
+//                arguments.get(0) = InternalState.getInstance().getPresentWorkingDirectory().toString() + "/" + arguments.get(0);
+                arguments.set(0, InternalState.getInstance().getPresentWorkingDirectory().toString() + "/" + arguments.get(0));
         }
 
-        path = Paths.get(params[0]);
+        path = Paths.get(arguments.get(0));
 
 //        else {
 //            if(values[0].charAt(0) != '/') {
@@ -116,12 +131,15 @@ public class ShellVerbs {
         return null;
     }
 
-    public static Object copyFile(String[] values) throws IOException{
-        if(values[0].equals("")) return null;
-        String sourceFilePath, destinationFilePath;
-        String[] paths = InternalFunctions.parsePaths(values[0]);
-        sourceFilePath = paths[0];
-        destinationFilePath = paths[1];
+    public static Object copyFile(ArrayList<String> parameters, ArrayList<String> arguments) throws IOException{
+        if(arguments.get(0).equals("")) return null;
+        String sourceFilePath = arguments.get(0), destinationFilePath = arguments.get(1);
+
+        if(sourceFilePath.charAt(0) != '/')
+            sourceFilePath = InternalState.getInstance().getPresentWorkingDirectory().toString() + '/' + sourceFilePath;
+
+        if(destinationFilePath.charAt(0) != '/')
+            destinationFilePath = InternalState.getInstance().getPresentWorkingDirectory().toString() + '/' + destinationFilePath;
 
         Path sourceFile = Paths.get(sourceFilePath);
         Path destinationFile = Paths.get(destinationFilePath);
@@ -155,12 +173,15 @@ public class ShellVerbs {
         return null;
     }
 
-    public static Object moveFile(String[] values) throws IOException{
-        if(values[0].equals("")) return null;
-        String sourceFilePath, destinationFilePath;
-        String[] paths = InternalFunctions.parsePaths(values[0]);
-        sourceFilePath = paths[0];
-        destinationFilePath = paths[1];
+    public static Object moveFile(ArrayList<String> parameters, ArrayList<String> arguments) throws IOException{
+        if(arguments.get(0).equals("")) return null;
+        String sourceFilePath = arguments.get(0), destinationFilePath = arguments.get(1);
+
+        if(sourceFilePath.charAt(0) != '/')
+            sourceFilePath = InternalState.getInstance().getPresentWorkingDirectory().toString() + '/' + sourceFilePath;
+
+        if(destinationFilePath.charAt(0) != '/')
+            destinationFilePath = InternalState.getInstance().getPresentWorkingDirectory().toString() + '/' + destinationFilePath;
 
         Path sourceFile = Paths.get(sourceFilePath);
         Path destinationFile = Paths.get(destinationFilePath);
@@ -192,11 +213,13 @@ public class ShellVerbs {
         return null;
     }
 
-    public static Void deleteFile(String[] values) throws IOException{
-        if(values[0].charAt(0) != '/')
-            values[0] = InternalState.getInstance().getPresentWorkingDirectory().toString() + '\\' + values[0];
-        Path deleteFile = Paths.get(values[0]);
-        if(Files.exists(deleteFile)) InternalFunctions.recursiveDelete(deleteFile);
+    public static Void deleteFile(ArrayList<String> parameters, ArrayList<String> arguments) throws IOException{
+        for(String path : arguments) {
+            if(path.charAt(0) != '/')
+                path = InternalState.getInstance().getPresentWorkingDirectory().toString() + '/' + path;
+            Path deleteFile = Paths.get(path);
+            if(Files.exists(deleteFile)) InternalFunctions.recursiveDelete(deleteFile);
+        }
         return null;
     }
 }
