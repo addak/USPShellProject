@@ -1,11 +1,14 @@
 package HelperClasses;
 
+import Parser.*;
+
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -221,5 +224,36 @@ public class ShellVerbs {
             if(Files.exists(deleteFile)) InternalFunctions.recursiveDelete(deleteFile);
         }
         return null;
+    }
+
+    public static String execute(ArrayList<String> parameters, ArrayList<String> arguments) throws Exception {
+        boolean shouldCapture = false;
+        if(arguments.size() > 0 && arguments.get(0).charAt(1) == 'c') shouldCapture = true;
+        String[] command = new String[arguments.size()]; int i = 0;
+        for(String argument: arguments) {
+            command[i++] = argument;
+        }
+        ProcessBuilder processBuilder = new ProcessBuilder()
+                .command(command)
+                .directory(InternalState.getInstance()
+                        .getPresentWorkingDirectory()
+                        .toFile()
+                );
+        if(shouldCapture) {
+            Process process = processBuilder.start();
+            BufferedReader reader = new BufferedReader(
+              new InputStreamReader(process.getInputStream())
+            );
+            String line;
+            StringBuilder output = new StringBuilder();
+            while((line = reader.readLine()) != null) output.append(
+              line + System.lineSeparator()
+            );
+            return output.toString();
+        }
+        else {
+            int exitCode = processBuilder.inheritIO().start().waitFor();
+            return null;
+        }
     }
 }

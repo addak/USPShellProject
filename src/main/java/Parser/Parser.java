@@ -33,7 +33,7 @@ public class Parser {
         return output;
     }
 
-    private static ParserOutput parseCommand(String commandLineInput) throws Exception{
+    public static ParserOutput parseCommand(String commandLineInput) throws Exception{
         Scanner s = new Scanner(commandLineInput);
         ArrayList<String> parameters = new ArrayList<>(), arguments = new ArrayList<>();
         String command = s.next(), restOfInput;

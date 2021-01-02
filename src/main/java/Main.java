@@ -25,30 +25,28 @@ public class Main {
         map.put("mv", ShellVerbs::moveFile);
         map.put("cp", ShellVerbs::copyFile);
         map.put("rm",ShellVerbs::deleteFile);
+        map.put("exec", ShellVerbs::execute);
     }
 
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
 
         Scanner scanner = new Scanner(new BufferedReader(new InputStreamReader(System.in)));
         InternalState.setScanner(scanner);
         while(true) {
             System.out.print(">> ");
-            String input = scanner.nextLine().trim();
-            ArrayList<ParserOutput> parserOutput = Parser.parseInput(input);
-            for(ParserOutput output : parserOutput) {
-                if(output.getCommand().equals("quit")) return;
-                VerbMapFunction function = map.get(output.getCommand());
-                if(function != null) function.call(output.getParameters(), output.getArguments());
-                else System.out.println(Colour.RED + output.getCommand() + ": command not found" + Colour.RESET);
+            try {
+                String input = scanner.nextLine().trim();
+                ArrayList<ParserOutput> parserOutput = Parser.parseInput(input);
+                for(ParserOutput output : parserOutput) {
+                    if(output.getCommand().equals("quit")) return;
+                    VerbMapFunction function = map.get(output.getCommand());
+                    if(function != null) function.call(output.getParameters(), output.getArguments());
+                    else System.out.println(Colour.RED + output.getCommand() + ": command not found" + Colour.RESET);
+                }
+            } catch (Exception e) {
+                System.out.println(Colour.RED + "Shell error: " + e.getMessage() + Colour.RESET);
             }
-//            String command = scanner.next();
-//            if(command.equals("quit")) return;
-//            String input = scanner.nextLine().trim();
-//            VerbMapFunction fn = map.get(command);
-//            String[] rest = {input};
-//            if (fn != null) fn.call(rest);
-//            else System.out.println("Invalid Verb!");
         }
 
     }
