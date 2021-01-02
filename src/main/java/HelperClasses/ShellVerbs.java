@@ -254,6 +254,7 @@ public class ShellVerbs {
     }
 
     public static void chmod(ArrayList<String> parameters, ArrayList<String> arguments) throws IOException{
+
         Path filePath = Paths.get(arguments.get(0));
 
         if(!Files.exists(filePath)) {
@@ -263,6 +264,7 @@ public class ShellVerbs {
         else if(parameters.size() == 0)
             return;
 
+        //https://www.programcreek.com/java-api-examples/?api=java.nio.file.attribute.PosixFilePermission
         String currentPerm = PosixFilePermissions.toString(Files.getPosixFilePermissions(filePath));
 
         boolean[] setPerm = new boolean[3];
