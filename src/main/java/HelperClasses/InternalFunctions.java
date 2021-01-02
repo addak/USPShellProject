@@ -3,10 +3,40 @@ package HelperClasses;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Formatter;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class InternalFunctions {
+
+    public static void lsParam(Path p, HashSet<Character> args) throws IOException {
+
+        if(!args.contains('a') && Files.isHidden(p))
+            return;
+
+        StringBuilder outputBuilder = new StringBuilder();
+
+        if(args.contains('l')){
+            BasicFileAttributes filesAttributes = Files.readAttributes(p, BasicFileAttributes.class);
+
+            SimpleDateFormat formatter = new SimpleDateFormat("MMM dd hh:mm:ss");
+            String lastModTime = formatter.format(new Date(filesAttributes.lastModifiedTime().toMillis()));
+
+            outputBuilder.append(String.format("%-6d %-16s ", filesAttributes.size(), lastModTime));
+        }
+
+        if(Files.isRegularFile(p))
+            outputBuilder.append(Colour.YELLOW).append(p.getFileName()).append(Colour.RESET);
+        else
+            outputBuilder.append(Colour.CYAN).append(p.getFileName()).append(Colour.RESET);
+
+        System.out.println(outputBuilder);
+
+    }
 
     public static void recursiveCopy(Path srcPath, Path desPath) throws IOException {
 

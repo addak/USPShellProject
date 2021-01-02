@@ -1,11 +1,13 @@
 package HelperClasses;
 
+import com.sun.jna.Native;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -20,6 +22,7 @@ import java.util.stream.Collectors;
  */
 
 public class ShellVerbs {
+    static POSIX posixFns = Native.load("c",POSIX.class);
 
     public static Object clearScreen(ArrayList<String> parameters, ArrayList<String> arguments) {
         //Doesn't work in IntelliJ's console but
@@ -121,12 +124,14 @@ public class ShellVerbs {
 //            }
 //            path = Paths.get(values[0]);
 //        }
+        HashSet<Character> params = new HashSet<>();
+        String paramString = parameters.size() != 0 ? parameters.get(0) : "";
+        for(int i=0; i < paramString.length(); i++)
+            params.add(paramString.charAt(i));
+
         List<Path> paths = Files.list(path).collect(Collectors.toList());
         for(Path pathOnj : paths){
-            if(Files.isRegularFile(pathOnj))
-                System.out.println(Colour.YELLOW + pathOnj.getFileName() + Colour.RESET);
-            else
-                System.out.println(Colour.CYAN + pathOnj.getFileName() + Colour.RESET);
+            InternalFunctions.lsParam(pathOnj,params);
         }
         return null;
     }
@@ -144,11 +149,17 @@ public class ShellVerbs {
         Path sourceFile = Paths.get(sourceFilePath);
         Path destinationFile = Paths.get(destinationFilePath);
 
+        HashSet<Character> params = new HashSet<>();
+        String paramString = parameters.size() != 0 ? parameters.get(0) : "";
+        for(int i=0; i < paramString.length(); i++)
+            params.add(paramString.charAt(i));
+
         if(Files.exists(sourceFile)){
             Path parent = destinationFile.getParent();
 
             if(Files.exists(destinationFile)){
-                System.out.println("Destination exists already. Do you wish to overwrite it? (Y/N)");
+                if(params.contains('i'))
+                    System.out.println("Destination exists already. Do you wish to overwrite it? (Y/N)");
                 String decision = InternalState.getScanner().nextLine().toUpperCase();
 
                 if(decision.equals("Y")){
@@ -186,11 +197,17 @@ public class ShellVerbs {
         Path sourceFile = Paths.get(sourceFilePath);
         Path destinationFile = Paths.get(destinationFilePath);
 
+        HashSet<Character> params = new HashSet<>();
+        String paramString = parameters.size() != 0 ? parameters.get(0) : "";
+        for(int i=0; i < paramString.length(); i++)
+            params.add(paramString.charAt(i));
+
         if(Files.exists(sourceFile)){
             Path parent = destinationFile.getParent();
 
             if(Files.exists(destinationFile)){
-                System.out.println("Destination already exists. Do you wish to overwrite it? (Y/N)");
+                if(params.contains('i'))
+                    System.out.println("Destination already exists. Do you wish to overwrite it? (Y/N)");
                 String decision = InternalState.getScanner().nextLine().toUpperCase();
 
                 if(decision.equals("Y")){
@@ -214,12 +231,100 @@ public class ShellVerbs {
     }
 
     public static Void deleteFile(ArrayList<String> parameters, ArrayList<String> arguments) throws IOException{
+        HashSet<Character> params = new HashSet<>();
+        String paramString = parameters.size() != 0 ? parameters.get(0) : "";
+        for(int i=0; i < paramString.length(); i++)
+            params.add(paramString.charAt(i));
+
         for(String path : arguments) {
             if(path.charAt(0) != '/')
                 path = InternalState.getInstance().getPresentWorkingDirectory().toString() + '/' + path;
             Path deleteFile = Paths.get(path);
-            if(Files.exists(deleteFile)) InternalFunctions.recursiveDelete(deleteFile);
+            if(Files.exists(deleteFile)) {
+
+                if(Files.isDirectory(deleteFile) && Files.list(deleteFile).count() > 0 && !params.contains('r')){
+                    System.out.println(Colour.RED + "Directory isn't empty" + Colour.RESET);
+                    return null;
+                }
+
+                InternalFunctions.recursiveDelete(deleteFile);
+            }
         }
         return null;
+    }
+
+    public static void chmod(ArrayList<String> parameters, ArrayList<String> arguments) throws IOException{
+        Path filePath = Paths.get(arguments.get(0));
+
+        if(!Files.exists(filePath)) {
+            System.out.println(Colour.RED + "File doesn't exist");
+            return;
+        }
+        else if(parameters.size() == 0)
+            return;
+
+        String currentPerm = PosixFilePermissions.toString(Files.getPosixFilePermissions(filePath));
+
+        boolean[] setPerm = new boolean[3];
+
+        setPerm[0] = currentPerm.charAt(0) == 'r';
+        setPerm[1] = currentPerm.charAt(1) == 'w';
+        setPerm[2] = currentPerm.charAt(2) == 'x';
+
+        int gPerm = 0;
+        gPerm += currentPerm.charAt(3) == 'r' ? 3 : 0;
+        gPerm += currentPerm.charAt(4) == 'w' ? 2 : 0;
+        gPerm += currentPerm.charAt(5) == 'x' ? 1 : 0;
+
+        int oPerm = 0;
+        oPerm += currentPerm.charAt(6) == 'r' ? 3 : 0;
+        oPerm += currentPerm.charAt(7) == 'w' ? 2 : 0;
+        oPerm += currentPerm.charAt(8) == 'x' ? 1 : 0;
+
+
+        String paramString = parameters.get(0) ;
+
+        boolean add = false;
+
+        for(int i=0; i < paramString.length(); i++){
+
+            if( paramString.charAt(i) == '+') {
+                add = true;
+                continue;
+            }
+            else if( paramString.charAt(i) == '-') {
+                add = false;
+                continue;
+            }
+
+            if(add){
+                if(paramString.charAt(i) == 'r')
+                    setPerm[0] = true;
+                else if( paramString.charAt(i) == 'w')
+                    setPerm[1] = true;
+                else if(paramString.charAt(i) == 'x')
+                    setPerm[2] = true;
+
+            }
+            else{
+                if(paramString.charAt(i) == 'r')
+                    setPerm[0] = false;
+                else if( paramString.charAt(i) == 'w')
+                    setPerm[1] = false;
+                else if(paramString.charAt(i) == 'x')
+                    setPerm[2] = false;
+
+            }
+        }
+
+        int currentValueOwnerPerm = 0;
+
+        currentValueOwnerPerm += setPerm[0] ? 3 : 0;
+        currentValueOwnerPerm += setPerm[1] ? 2 : 0;
+        currentValueOwnerPerm += setPerm[2] ? 1 : 0;
+
+        String mod = "0" + currentValueOwnerPerm + gPerm + oPerm;
+
+        posixFns.chmod(filePath.toAbsolutePath().toString(), Integer.parseInt(mod));
     }
 }
