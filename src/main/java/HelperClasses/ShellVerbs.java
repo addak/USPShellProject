@@ -528,6 +528,32 @@ public class ShellVerbs {
         return null;
     }
 
+    public static Void displayFile (ArrayList<String> parameters, ArrayList<String> arguments) throws Exception {
 
+        Path path;
+        String line;
+
+        if(arguments.size() == 0) {
+            System.out.println(Colour.RED + "display: no path or filename specified" + Colour.RESET);
+            return null;
+        }
+
+        path = InternalFunctions.getPath(arguments.get(0));
+
+        if(!Files.exists(path)) {
+            System.out.println(Colour.RED + "display: file does not exist" + Colour.RESET);
+            return null;
+        }
+
+        if(!Files.isRegularFile(path)) {
+            System.out.println(Colour.RED + "display: " + path.toString() + " is not a file" + Colour.RESET);
+            return null;
+        }
+
+        BufferedReader reader = new BufferedReader(new FileReader(path.toString()));
+        while((line = reader.readLine()) != null) System.out.println(line);
+        return null;
+
+    }
 
 }
