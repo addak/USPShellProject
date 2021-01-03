@@ -258,16 +258,16 @@ public class ShellVerbs {
         return null;
     }
 
-    public static void chmod(ArrayList<String> parameters, ArrayList<String> arguments) throws IOException{
+    public static Object chmod(ArrayList<String> parameters, ArrayList<String> arguments) throws IOException{
 
         Path filePath = Paths.get(arguments.get(0));
 
         if(!Files.exists(filePath)) {
-            System.out.println(Colour.RED + "File doesn't exist");
-            return;
+            System.out.println(Colour.RED + "File doesn't exist" + Colour.RESET);
+            return null;
         }
         else if(parameters.size() == 0)
-            return;
+            return null;
 
         //https://www.programcreek.com/java-api-examples/?api=java.nio.file.attribute.PosixFilePermission
         String currentPerm = PosixFilePermissions.toString(Files.getPosixFilePermissions(filePath));
@@ -333,6 +333,8 @@ public class ShellVerbs {
         String mod = "0" + currentValueOwnerPerm + gPerm + oPerm;
 
         posixFns.chmod(filePath.toAbsolutePath().toString(), Integer.parseInt(mod));
+
+        return null;
     }
 
     public static String execute(ArrayList<String> parameters, ArrayList<String> arguments) throws Exception {
@@ -361,7 +363,9 @@ public class ShellVerbs {
             return output.toString();
         }
         else {
-            int exitCode = processBuilder.inheritIO().start().waitFor();
+            Process process = processBuilder.inheritIO().start();
+            System.out.println(process.toHandle().pid());
+            int exitCode = process.waitFor();
             return null;
         }
     }

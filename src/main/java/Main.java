@@ -26,6 +26,7 @@ public class Main {
         map.put("cp", ShellVerbs::copyFile);
         map.put("rm",ShellVerbs::deleteFile);
         map.put("exec", ShellVerbs::execute);
+        map.put("chmod", ShellVerbs::chmod);
     }
 
 

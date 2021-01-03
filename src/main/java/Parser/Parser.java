@@ -50,7 +50,7 @@ public class Parser {
             ParseTree tree = parser.input();
             for(int i = 0; i < tree.getChildCount(); ++i) {
                 String token = tree.getChild(i).toString();
-                if(token.charAt(0) == '-') parameters.add(token);
+                if(token.charAt(0) == '-' || token.charAt(0) == '+') parameters.add(token);
                 else if(token.charAt(0) == '"') arguments.add(token.substring(1, token.length()-1));
                 else arguments.add(token);
             }
