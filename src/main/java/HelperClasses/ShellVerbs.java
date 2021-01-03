@@ -12,6 +12,7 @@ import java.nio.file.attribute.PosixFilePermissions;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Scanner;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -89,39 +90,9 @@ public class ShellVerbs {
 //            arguments.set(0, InternalState.getInstance().getPresentWorkingDirectory().toString());
 //        }
         if(arguments.size() == 0)
-            arguments.add(InternalState.getInstance().getPresentWorkingDirectory().toString());
-        else if(arguments.get(0).equals("."))
-            arguments.set(0, InternalState.getInstance().getPresentWorkingDirectory().toString());
-        else if (arguments.get(0).equals("..")) {
-
-            Path pwd = InternalState.getInstance().getPresentWorkingDirectory();
-//            if(pwd.getParent() != null)
-//                arguments.get(0) = pwd.getParent().toString();
-            if(pwd.getParent() != null)
-                arguments.set(0, pwd.getParent().toString());
-//            else
-//                arguments.get(0) = pwd.toString();
-            else
-                arguments.set(0, pwd.toString());
-
-        }
-        else{
-            Pattern absPathPattern = Pattern.compile("^[A-Z]:.*");
-            if(arguments.get(0).startsWith("."+ File.separator)){
-//                arguments.get(0) = InternalState.getInstance().getPresentWorkingDirectory().toString() + arguments.get(0).substring(1);
-                arguments.set(0, InternalState.getInstance().getPresentWorkingDirectory().toString() + arguments.get(0).substring(1));
-            }
-            else if(arguments.get(0).startsWith(File.separator)){
-                Path pwd = InternalState.getInstance().getPresentWorkingDirectory().getRoot();
-//                arguments.get(0) = pwd.toString() + arguments.get(0).substring(1);
-                arguments.set(0, pwd.toString() + arguments.get(0).substring(1));
-            }
-            else if(!absPathPattern.matcher(arguments.get(0)).matches())
-//                arguments.get(0) = InternalState.getInstance().getPresentWorkingDirectory().toString() + "/" + arguments.get(0);
-                arguments.set(0, InternalState.getInstance().getPresentWorkingDirectory().toString() + "/" + arguments.get(0));
-        }
-
-        path = Paths.get(arguments.get(0));
+            path = InternalState.getInstance().getPresentWorkingDirectory();
+        else
+            path = InternalFunctions.getPath(arguments.get(0));
 
 //        else {
 //            if(values[0].charAt(0) != '/') {
@@ -264,39 +235,8 @@ public class ShellVerbs {
             System.out.println(Colour.RED + "No arguments" + Colour.RESET);
             return null;
         }
-        else if(arguments.get(0).equals("."))
-            arguments.set(0, InternalState.getInstance().getPresentWorkingDirectory().toString());
-        else if (arguments.get(0).equals("..")) {
 
-            Path pwd = InternalState.getInstance().getPresentWorkingDirectory();
-//            if(pwd.getParent() != null)
-//                arguments.get(0) = pwd.getParent().toString();
-            if(pwd.getParent() != null)
-                arguments.set(0, pwd.getParent().toString());
-//            else
-//                arguments.get(0) = pwd.toString();
-            else
-                arguments.set(0, pwd.toString());
-
-        }
-        else{
-            Pattern absPathPattern = Pattern.compile("^[A-Z]:.*");
-            if(arguments.get(0).startsWith("."+ File.separator)){
-//                arguments.get(0) = InternalState.getInstance().getPresentWorkingDirectory().toString() + arguments.get(0).substring(1);
-                arguments.set(0, InternalState.getInstance().getPresentWorkingDirectory().toString() + arguments.get(0).substring(1));
-            }
-            else if(arguments.get(0).startsWith(File.separator)){
-                Path pwd = InternalState.getInstance().getPresentWorkingDirectory().getRoot();
-//                arguments.get(0) = pwd.toString() + arguments.get(0).substring(1);
-                arguments.set(0, pwd.toString() + arguments.get(0).substring(1));
-            }
-            else if(!absPathPattern.matcher(arguments.get(0)).matches())
-//                arguments.get(0) = InternalState.getInstance().getPresentWorkingDirectory().toString() + "/" + arguments.get(0);
-                arguments.set(0, InternalState.getInstance().getPresentWorkingDirectory().toString() + "/" + arguments.get(0));
-        }
-
-
-        Path filePath = Paths.get(arguments.get(0));
+        Path filePath = InternalFunctions.getPath(arguments.get(0));
 
         if(!Files.exists(filePath)) {
             System.out.println(Colour.RED + "File doesn't exist" +Colour.RESET);
@@ -372,6 +312,78 @@ public class ShellVerbs {
         int val = Integer.parseInt(mod,8);
 
         posixFns.chmod(filePath.toAbsolutePath().toString(), val);
+
+        return null;
+    }
+
+    public static Void chown(ArrayList<String> paramters, ArrayList<String> arguments) throws IOException{
+
+        if(arguments.size() != 2){
+            System.out.println(Colour.RED + "Invalid no. of arguments" + Colour.RESET);
+            return null;
+        }
+        else{
+            String arg1 = arguments.get(0);
+            String[] values = arg1.split(":");
+            String userName = null, groupName = null;
+
+            Path filePath = InternalFunctions.getPath(arguments.get(1));
+
+            if(!arg1.contains(":")){
+                userName = arg1;
+            }
+            else if( arg1.endsWith(":")){
+                userName = groupName = values[0];
+            }
+            else if(values.length == 2){
+                if(!values[0].isEmpty() && !values[1].isEmpty()){
+                    userName = values[0];
+                    groupName = values[1];
+                }
+                else if(values[0].isEmpty() && !values[1].isEmpty()){
+                    groupName = values[1];
+                }
+                else{
+                    System.out.println(Colour.RED + "Invalid format");
+                    return null;
+                }
+            }
+
+            int uId = -1,gId = -1;
+            Process child;
+            Scanner s;
+            if(userName != null && !userName.isEmpty()){
+                String command = "id -u " + userName;
+                child = Runtime.getRuntime().exec(command);
+                s = new Scanner(child.getInputStream());
+                try{
+                    uId = Integer.parseInt(s.nextLine());
+                }
+                catch (Exception e){
+                    s = new Scanner(child.getErrorStream());
+                    System.out.println(Colour.RED + s.nextLine() + Colour.RESET);
+                    return null;
+                }
+            }
+
+            if(groupName != null && !groupName.isEmpty()){
+                String command = "id -g " + groupName;
+                child = Runtime.getRuntime().exec(command);
+
+                s = new Scanner(child.getInputStream());
+                try{
+                    gId = Integer.parseInt(s.nextLine());
+                }
+                catch (Exception e){
+                    s = new Scanner(child.getErrorStream());
+                    System.out.println(Colour.RED + s.nextLine() + Colour.RESET);
+                    return null;
+                }
+            }
+
+            posixFns.chown(filePath.toAbsolutePath().toString(),uId, gId);
+
+        }
 
         return null;
     }

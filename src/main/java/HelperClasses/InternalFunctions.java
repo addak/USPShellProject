@@ -1,14 +1,17 @@
 package HelperClasses;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Formatter;
 import java.util.HashSet;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class InternalFunctions {
@@ -105,5 +108,43 @@ public class InternalFunctions {
             }
             Files.delete(path);
         } else if (Files.isRegularFile(path)) Files.delete(path);
+    }
+
+    public static Path getPath(String pathString){
+
+        String absPath = "";
+
+        if(pathString.equals("."))
+            absPath = InternalState.getInstance().getPresentWorkingDirectory().toString();
+        else if (pathString.equals("..")) {
+
+            Path pwd = InternalState.getInstance().getPresentWorkingDirectory();
+//            if(pwd.getParent() != null)
+//                arguments.get(0) = pwd.getParent().toString();
+            if(pwd.getParent() != null)
+                absPath = pwd.getParent().toString();
+//            else
+//                arguments.get(0) = pwd.toString();
+            else
+                absPath = pwd.toString();
+
+        }
+        else{
+            Pattern absPathPattern = Pattern.compile("^[A-Z]:.*");
+            if(pathString.startsWith("."+ File.separator)){
+//                arguments.get(0) = InternalState.getInstance().getPresentWorkingDirectory().toString() + arguments.get(0).substring(1);
+                absPath = InternalState.getInstance().getPresentWorkingDirectory().toString() + pathString.substring(1);
+            }
+            else if(pathString.startsWith(File.separator)){
+                Path pwd = InternalState.getInstance().getPresentWorkingDirectory().getRoot();
+//                arguments.get(0) = pwd.toString() + arguments.get(0).substring(1);
+                absPath = pwd.toString() + pathString.substring(1);
+            }
+            else if(!absPathPattern.matcher(pathString).matches())
+//                arguments.get(0) = InternalState.getInstance().getPresentWorkingDirectory().toString() + "/" + arguments.get(0);
+                absPath =  InternalState.getInstance().getPresentWorkingDirectory().toString() + "/" + pathString;
+        }
+
+        return Paths.get(absPath);
     }
 }
