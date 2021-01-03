@@ -43,6 +43,8 @@ public class Main {
                 String input = scanner.nextLine().trim();
                 if(!input.equals("")) {
                     ArrayList<ParserOutput> parserOutput = Parser.parseInput(input);
+                    HistoryTableEntry entry = new HistoryTableEntry(input, parserOutput);
+                    InternalState.getInstance().updateCommandHistory(entry);
                     InternalFunctions.executeCommands(parserOutput);
                 }
             } catch (Exception e) {

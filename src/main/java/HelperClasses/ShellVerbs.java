@@ -6,11 +6,7 @@ import com.sun.jna.Native;
 import java.io.*;
 import java.nio.file.*;
 import java.nio.file.attribute.PosixFilePermissions;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -554,6 +550,35 @@ public class ShellVerbs {
         while((line = reader.readLine()) != null) System.out.println(line);
         return null;
 
+    }
+
+    public static Void commandHistory(ArrayList<String> parameters, ArrayList<String> arguments) throws Exception {
+        LinkedList<HistoryTableEntry> commandHistory = InternalState.getInstance().getCommandHistory();
+        if(arguments.size() == 0) {
+            System.out.println("Last 10 commands (newest first):");
+            Iterator<HistoryTableEntry> iterator = commandHistory.iterator();
+            int i = 1;
+            while(iterator.hasNext()) {
+                System.out.println((i++) + ": " + iterator.next().getFullCommand());
+            }
+        } else {
+            try {
+                int index = Integer.parseInt(arguments.get(0));
+                if(index > 10 || index < 1) {
+                    System.out.println(Colour.RED + "history: index must be in the range 1-10" + Colour.RESET);
+                    return null;
+                } else {
+                    HistoryTableEntry entry = commandHistory.get(index - 1);
+                    InternalState.getInstance().updateCommandHistory(entry);
+                    InternalFunctions.executeCommands(
+                            entry.getParserOutput()
+                    );
+                }
+            } catch (NumberFormatException e) {
+                System.out.println(Colour.RED + "history: invalid index" + Colour.RESET);
+            }
+        }
+        return null;
     }
 
 }

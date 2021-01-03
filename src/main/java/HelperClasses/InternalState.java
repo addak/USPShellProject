@@ -7,12 +7,14 @@ package HelperClasses;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Scanner;
 
 public class InternalState {
     private static InternalState instance = null;
 
     private HashMap<Long, JobTableEntry> jobTable;
+    private LinkedList<HistoryTableEntry> commandHistory;
     private static HashMap<String,VerbMapFunction> map = new HashMap<>();
 
     private Path presentWorkingDirectory;
@@ -33,11 +35,13 @@ public class InternalState {
         map.put("killjob", ShellVerbs::killBackgroundJobs);
         map.put("create", ShellVerbs::createFile);
         map.put("display", ShellVerbs::displayFile);
+        map.put("history", ShellVerbs::commandHistory);
     }
 
     private InternalState() {
         presentWorkingDirectory = Paths.get(System.getProperty("user.dir"));
         jobTable = new HashMap<>();
+        commandHistory = new LinkedList<>();
     }
 
     public static InternalState getInstance() {
@@ -66,4 +70,13 @@ public class InternalState {
     public HashMap<Long, JobTableEntry> getJobTable() { return jobTable; }
 
     public static HashMap<String, VerbMapFunction> getMap() { return map; }
+
+    public void updateCommandHistory(HistoryTableEntry entry) {
+        if(commandHistory.size() == 10) commandHistory.removeLast();
+        commandHistory.addFirst(entry);
+    }
+
+    public LinkedList<HistoryTableEntry> getCommandHistory() {
+        return commandHistory;
+    }
 }

@@ -151,6 +151,9 @@ public class InternalFunctions {
         ParserOutput output = parserOutput.get(0);
         String commandOutput = null;
         if(output.getCommand().equals("quit")) return;
+        else if(output.getCommand().equals("history")) {
+            InternalState.getInstance().getCommandHistory().removeFirst();
+        }
         VerbMapFunction function = InternalState.getMap().get(output.getCommand());
         if(function != null) {
             commandOutput = (String) function.call(output.getParameters(), output.getArguments());
