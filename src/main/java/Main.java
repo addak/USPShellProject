@@ -28,6 +28,9 @@ public class Main {
         map.put("chmod", ShellVerbs::chmod);
         map.put("exec", ShellVerbs::execute);
         map.put("chown",ShellVerbs::chown);
+        map.put("bgjobs", ShellVerbs::showBackgroundJobs);
+        map.put("killjob", ShellVerbs::killBackgroundJobs);
+
     }
 
 

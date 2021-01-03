@@ -10,6 +10,7 @@ import java.io.InputStreamReader;
 import java.nio.file.*;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
@@ -316,7 +317,7 @@ public class ShellVerbs {
         return null;
     }
 
-    public static Void chown(ArrayList<String> paramters, ArrayList<String> arguments) throws IOException{
+    public static Void chown(ArrayList<String> parameters, ArrayList<String> arguments) throws IOException{
 
         if(arguments.size() != 2){
             System.out.println(Colour.RED + "Invalid no. of arguments" + Colour.RESET);
@@ -389,18 +390,24 @@ public class ShellVerbs {
     }
 
     public static String execute(ArrayList<String> parameters, ArrayList<String> arguments) throws Exception {
-        boolean shouldCapture = false;
-        if(arguments.size() > 0 && arguments.get(0).charAt(1) == 'c') shouldCapture = true;
+        boolean shouldCapture = false, shouldRunInBackground = false;
+        if(parameters.size() > 0 && parameters.get(0).charAt(1) == 'c') shouldCapture = true;
+        else if(parameters.size() > 0 && parameters.get(0).charAt(1) == 'b') shouldRunInBackground = true;
+
+        StringBuilder fullCommand = new StringBuilder();
         String[] command = new String[arguments.size()]; int i = 0;
         for(String argument: arguments) {
             command[i++] = argument;
+            fullCommand.append(argument + " ");
         }
+
         ProcessBuilder processBuilder = new ProcessBuilder()
                 .command(command)
                 .directory(InternalState.getInstance()
                         .getPresentWorkingDirectory()
                         .toFile()
                 );
+
         if(shouldCapture) {
             Process process = processBuilder.start();
             BufferedReader reader = new BufferedReader(
@@ -411,12 +418,81 @@ public class ShellVerbs {
             while((line = reader.readLine()) != null) output.append(line)
                     .append(System.lineSeparator());
             return output.toString();
-        }
-        else {
+        } else if (shouldRunInBackground) {
+            Process process = processBuilder.start();
+            Long pid = process.pid();
+            JobTableEntry entry = new JobTableEntry(fullCommand.toString(), process.toHandle());
+            InternalState.getInstance().addJob(pid, entry);
+            return null;
+        } else {
             Process process = processBuilder.inheritIO().start();
             System.out.println(process.toHandle().pid());
             int exitCode = process.waitFor();
             return null;
         }
     }
+
+    public static Void showBackgroundJobs(ArrayList<String> parameters, ArrayList<String> arguments) throws Exception{
+        HashMap<Long, JobTableEntry> jobTable = InternalState.getInstance().getJobTable();
+        if(arguments.size() == 0) {
+            System.out.println("Current background jobs: ");
+            System.out.println("PID - Command - Alive");
+            for(Long pid : jobTable.keySet()) {
+                JobTableEntry entry = jobTable.get(pid);
+                System.out.println(pid + " - " + entry.getFullCommand() + " - " + entry.getJobHandle().isAlive());
+            }
+        } else {
+            System.out.println("PID - Command - Alive");
+            for(String argument : arguments) {
+                Long pid = null;
+                try {
+                    pid = Long.parseLong(argument);
+                } catch (NumberFormatException e) {
+                    System.out.println(Colour.RED + argument + " is not a valid PID" + Colour.RESET);
+                }
+                if(pid != null) {
+                    JobTableEntry entry = InternalState.getInstance().getJobTable().getOrDefault(pid, null);
+                    if(entry != null) {
+                        System.out.println(pid + " - " + entry.getFullCommand() + " - " + entry.getJobHandle().isAlive());
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    public static Void killBackgroundJobs (ArrayList<String> parameters, ArrayList<String> arguments) throws Exception {
+        if(arguments.size() > 0) {
+            HashMap<Long, JobTableEntry> jobTable = InternalState.getInstance().getJobTable();
+            if(arguments.get(0).charAt(0) == '*') {
+                for(Long pid : jobTable.keySet()) {
+                    ProcessHandle job = jobTable.get(pid).getJobHandle();
+                    if(job.isAlive()) {
+                        if(parameters.size() > 0 && parameters.get(0).charAt(1) == 'f') job.destroyForcibly();
+                        else job.destroy();
+                        jobTable.remove(pid);
+                    }
+                }
+            } else {
+                for(String argument : arguments) {
+                    Long pid = null;
+                    try {
+                        pid = Long.parseLong(argument);
+                    } catch (NumberFormatException e) {
+                        System.out.println(Colour.RED + argument + " is not a valid PID" + Colour.RESET);
+                    }
+                    if(pid != null) {
+                        ProcessHandle job = jobTable.get(pid).getJobHandle();
+                        if(job.isAlive()) {
+                            if(parameters.size() > 0 && parameters.get(0).charAt(1) == 'f') job.destroyForcibly();
+                            else job.destroy();
+                            jobTable.remove(pid);
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
 }
