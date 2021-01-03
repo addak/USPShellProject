@@ -24,7 +24,7 @@ import java.util.Scanner;
 public class Parser {
 
     public static ArrayList<ParserOutput> parseInput(String fullCommand) throws Exception {
-        ArrayList<ParserOutput> output = new ArrayList<>();
+        ArrayList<ParserOutput> output = new ArrayList<>(1);
         String[] commands = fullCommand.trim().split("(\\|)|( \\| )");
         for(String command: commands) {
             ParserOutput commandParserOutput = parseCommand(command);

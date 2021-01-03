@@ -44,12 +44,32 @@ public class Main {
             System.out.print(">> ");
             try {
                 String input = scanner.nextLine().trim();
-                ArrayList<ParserOutput> parserOutput = Parser.parseInput(input);
-                for(ParserOutput output : parserOutput) {
+                if(!input.equals("")) {
+                    ArrayList<ParserOutput> parserOutput = Parser.parseInput(input);
+                    ParserOutput output = parserOutput.get(0);
+                    String commandOutput = null;
                     if(output.getCommand().equals("quit")) return;
                     VerbMapFunction function = map.get(output.getCommand());
-                    if(function != null) function.call(output.getParameters(), output.getArguments());
-                    else System.out.println(Colour.RED + output.getCommand() + ": command not found" + Colour.RESET);
+                    if(function != null) {
+                        commandOutput = (String) function.call(output.getParameters(), output.getArguments());
+                        if(commandOutput == null) commandOutput = "";
+                    } else {
+                        System.out.println(Colour.RED + output.getCommand() +" : command not found" + Colour.RESET);
+                        continue;
+                    }
+                    for(int i = 1; i < parserOutput.size(); ++i) {
+                        output = parserOutput.get(i);
+                        output.getArguments().add(commandOutput);
+                        if(output.getCommand().equals("quit")) return;
+                        function = map.get(output.getCommand());
+                        if(function != null) {
+                            commandOutput = (String) function.call(output.getParameters(), output.getArguments());
+                            if(commandOutput == null) commandOutput = "";
+                        } else {
+                            System.out.println(Colour.RED + output.getCommand() +" : command not found" + Colour.RESET);
+                            continue;
+                        }
+                    }
                 }
             } catch (Exception e) {
                 System.out.println(Colour.RED + "Shell error: " + e.getMessage() + Colour.RESET);
