@@ -3,10 +3,7 @@ package HelperClasses;
 import Parser.*;
 import com.sun.jna.Native;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.file.*;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.ArrayList;
@@ -494,5 +491,43 @@ public class ShellVerbs {
         }
         return null;
     }
+
+    public static Void createFile(ArrayList<String> parameters, ArrayList<String> arguments) throws Exception {
+        boolean shouldOverwrite = false;
+        Path path;
+
+        if(parameters.size() > 0 && parameters.get(0).charAt(1) == 'f') shouldOverwrite = true;
+
+
+        if(arguments.size() == 0) {
+            System.out.println(Colour.RED + "create: no path or filename specified" + Colour.RESET);
+            return null;
+        } else {
+            path = InternalFunctions.getPath(arguments.get(0));
+            boolean res = new File(path.toString()).getParentFile().mkdirs();
+        }
+
+        if(shouldOverwrite) {
+            Files.deleteIfExists(path);
+        } else if(Files.exists(path)) {
+            System.out.print(Colour.YELLOW + "File exists. Should overwrite?[Y/N]: " + Colour.RESET);
+            if(InternalState.getScanner().nextLine().toUpperCase().charAt(0) == 'Y') Files.delete(path);
+            else return null;
+        }
+
+        Files.createFile(path);
+        new File(path.toString()).getParentFile().mkdirs();
+
+        if(arguments.size() > 1) {
+            String content = arguments.get(1);
+            BufferedWriter writer = new BufferedWriter(new FileWriter(path.toString()));
+            writer.write(content + System.lineSeparator());
+            writer.close();
+        }
+
+        return null;
+    }
+
+
 
 }

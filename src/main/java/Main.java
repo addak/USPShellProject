@@ -30,6 +30,7 @@ public class Main {
         map.put("chown",ShellVerbs::chown);
         map.put("bgjobs", ShellVerbs::showBackgroundJobs);
         map.put("killjob", ShellVerbs::killBackgroundJobs);
+        map.put("create", ShellVerbs::createFile);
 
     }
 
