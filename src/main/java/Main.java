@@ -16,7 +16,7 @@ public class Main {
 
     static HashMap<String,VerbMapFunction> map = new HashMap<>();
 
-    static{
+    static {
 
         map.put("ls", ShellVerbs::listFiles);
         map.put("pwd", ShellVerbs::presentWorkingDirectory);
@@ -24,9 +24,9 @@ public class Main {
         map.put("cls", ShellVerbs::clearScreen);
         map.put("mv", ShellVerbs::moveFile);
         map.put("cp", ShellVerbs::copyFile);
-        map.put("rm",ShellVerbs::deleteFile);
-        map.put("exec", ShellVerbs::execute);
+        map.put("rm", ShellVerbs::deleteFile);
         map.put("chmod", ShellVerbs::chmod);
+        map.put("exec", ShellVerbs::execute);
     }
 
 

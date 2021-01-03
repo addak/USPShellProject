@@ -258,16 +258,54 @@ public class ShellVerbs {
         return null;
     }
 
-    public static Object chmod(ArrayList<String> parameters, ArrayList<String> arguments) throws IOException{
+    public static Void chmod(ArrayList<String> parameters, ArrayList<String> arguments) throws IOException{
+
+        if(arguments.size() == 0){
+            System.out.println(Colour.RED + "No arguments" + Colour.RESET);
+            return null;
+        }
+        else if(arguments.get(0).equals("."))
+            arguments.set(0, InternalState.getInstance().getPresentWorkingDirectory().toString());
+        else if (arguments.get(0).equals("..")) {
+
+            Path pwd = InternalState.getInstance().getPresentWorkingDirectory();
+//            if(pwd.getParent() != null)
+//                arguments.get(0) = pwd.getParent().toString();
+            if(pwd.getParent() != null)
+                arguments.set(0, pwd.getParent().toString());
+//            else
+//                arguments.get(0) = pwd.toString();
+            else
+                arguments.set(0, pwd.toString());
+
+        }
+        else{
+            Pattern absPathPattern = Pattern.compile("^[A-Z]:.*");
+            if(arguments.get(0).startsWith("."+ File.separator)){
+//                arguments.get(0) = InternalState.getInstance().getPresentWorkingDirectory().toString() + arguments.get(0).substring(1);
+                arguments.set(0, InternalState.getInstance().getPresentWorkingDirectory().toString() + arguments.get(0).substring(1));
+            }
+            else if(arguments.get(0).startsWith(File.separator)){
+                Path pwd = InternalState.getInstance().getPresentWorkingDirectory().getRoot();
+//                arguments.get(0) = pwd.toString() + arguments.get(0).substring(1);
+                arguments.set(0, pwd.toString() + arguments.get(0).substring(1));
+            }
+            else if(!absPathPattern.matcher(arguments.get(0)).matches())
+//                arguments.get(0) = InternalState.getInstance().getPresentWorkingDirectory().toString() + "/" + arguments.get(0);
+                arguments.set(0, InternalState.getInstance().getPresentWorkingDirectory().toString() + "/" + arguments.get(0));
+        }
+
 
         Path filePath = Paths.get(arguments.get(0));
 
         if(!Files.exists(filePath)) {
-            System.out.println(Colour.RED + "File doesn't exist" + Colour.RESET);
+            System.out.println(Colour.RED + "File doesn't exist" +Colour.RESET);
             return null;
         }
-        else if(parameters.size() == 0)
+        else if(parameters.size() == 0) {
+            System.out.println(Colour.RED + "No paramters mentioned" + Colour.RESET);
             return null;
+        }
 
         //https://www.programcreek.com/java-api-examples/?api=java.nio.file.attribute.PosixFilePermission
         String currentPerm = PosixFilePermissions.toString(Files.getPosixFilePermissions(filePath));
@@ -279,12 +317,12 @@ public class ShellVerbs {
         setPerm[2] = currentPerm.charAt(2) == 'x';
 
         int gPerm = 0;
-        gPerm += currentPerm.charAt(3) == 'r' ? 3 : 0;
+        gPerm += currentPerm.charAt(3) == 'r' ? 4 : 0;
         gPerm += currentPerm.charAt(4) == 'w' ? 2 : 0;
         gPerm += currentPerm.charAt(5) == 'x' ? 1 : 0;
 
         int oPerm = 0;
-        oPerm += currentPerm.charAt(6) == 'r' ? 3 : 0;
+        oPerm += currentPerm.charAt(6) == 'r' ? 4 : 0;
         oPerm += currentPerm.charAt(7) == 'w' ? 2 : 0;
         oPerm += currentPerm.charAt(8) == 'x' ? 1 : 0;
 
@@ -326,13 +364,14 @@ public class ShellVerbs {
 
         int currentValueOwnerPerm = 0;
 
-        currentValueOwnerPerm += setPerm[0] ? 3 : 0;
+        currentValueOwnerPerm += setPerm[0] ? 4 : 0;
         currentValueOwnerPerm += setPerm[1] ? 2 : 0;
         currentValueOwnerPerm += setPerm[2] ? 1 : 0;
 
         String mod = "0" + currentValueOwnerPerm + gPerm + oPerm;
+        int val = Integer.parseInt(mod,8);
 
-        posixFns.chmod(filePath.toAbsolutePath().toString(), Integer.parseInt(mod));
+        posixFns.chmod(filePath.toAbsolutePath().toString(), val);
 
         return null;
     }
@@ -357,9 +396,8 @@ public class ShellVerbs {
             );
             String line;
             StringBuilder output = new StringBuilder();
-            while((line = reader.readLine()) != null) output.append(
-              line + System.lineSeparator()
-            );
+            while((line = reader.readLine()) != null) output.append(line)
+                    .append(System.lineSeparator());
             return output.toString();
         }
         else {
