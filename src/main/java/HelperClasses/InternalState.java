@@ -13,8 +13,27 @@ public class InternalState {
     private static InternalState instance = null;
 
     private HashMap<Long, JobTableEntry> jobTable;
+    private static HashMap<String,VerbMapFunction> map = new HashMap<>();
+
     private Path presentWorkingDirectory;
     private static Scanner reader;
+
+    static {
+        map.put("ls", ShellVerbs::listFiles);
+        map.put("pwd", ShellVerbs::presentWorkingDirectory);
+        map.put("cd", ShellVerbs::changeDirectory);
+        map.put("cls", ShellVerbs::clearScreen);
+        map.put("mv", ShellVerbs::moveFile);
+        map.put("cp", ShellVerbs::copyFile);
+        map.put("rm", ShellVerbs::deleteFile);
+        map.put("chmod", ShellVerbs::chmod);
+        map.put("exec", ShellVerbs::execute);
+        map.put("chown",ShellVerbs::chown);
+        map.put("bgjobs", ShellVerbs::showBackgroundJobs);
+        map.put("killjob", ShellVerbs::killBackgroundJobs);
+        map.put("create", ShellVerbs::createFile);
+        map.put("display", ShellVerbs::displayFile);
+    }
 
     private InternalState() {
         presentWorkingDirectory = Paths.get(System.getProperty("user.dir"));
@@ -45,4 +64,6 @@ public class InternalState {
     public void removeJob(Long pid) {jobTable.remove(pid);}
 
     public HashMap<Long, JobTableEntry> getJobTable() { return jobTable; }
+
+    public static HashMap<String, VerbMapFunction> getMap() { return map; }
 }

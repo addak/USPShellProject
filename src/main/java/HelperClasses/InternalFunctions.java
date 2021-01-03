@@ -1,5 +1,7 @@
 package HelperClasses;
 
+import Parser.ParserOutput;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -7,10 +9,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Formatter;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -146,5 +145,32 @@ public class InternalFunctions {
         }
 
         return Paths.get(absPath);
+    }
+
+    public static void executeCommands(ArrayList<ParserOutput> parserOutput) throws Exception{
+        ParserOutput output = parserOutput.get(0);
+        String commandOutput = null;
+        if(output.getCommand().equals("quit")) return;
+        VerbMapFunction function = InternalState.getMap().get(output.getCommand());
+        if(function != null) {
+            commandOutput = (String) function.call(output.getParameters(), output.getArguments());
+            if(commandOutput == null) commandOutput = "";
+        } else {
+            System.out.println(Colour.RED + output.getCommand() +" : command not found" + Colour.RESET);
+            return;
+        }
+        for(int i = 1; i < parserOutput.size(); ++i) {
+            output = parserOutput.get(i);
+            output.getArguments().add(commandOutput);
+            if(output.getCommand().equals("quit")) return;
+            function = InternalState.getMap().get(output.getCommand());
+            if(function != null) {
+                commandOutput = (String) function.call(output.getParameters(), output.getArguments());
+                if(commandOutput == null) commandOutput = "";
+            } else {
+                System.out.println(Colour.RED + output.getCommand() +" : command not found" + Colour.RESET);
+                continue;
+            }
+        }
     }
 }
