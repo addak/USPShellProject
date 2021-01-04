@@ -3,6 +3,9 @@ package Interfaces;
 import com.sun.jna.*;
 
 /*
+    This interface contains mappings for all of the native C libraries
+    used by the shell via Java Native Access (JNA).
+
     Init object as below (in Internal state I guess)
     POSIX posix = (POSIX) Native.load("c",POSIX.class);
 

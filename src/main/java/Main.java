@@ -11,26 +11,11 @@ import java.util.Scanner;
 
 public class Main {
 
-//    static HashMap<String,VerbMapFunction> map = new HashMap<>();
-//
-//    static {
-//
-//        map.put("ls", ShellVerbs::listFiles);
-//        map.put("pwd", ShellVerbs::presentWorkingDirectory);
-//        map.put("cd", ShellVerbs::changeDirectory);
-//        map.put("cls", ShellVerbs::clearScreen);
-//        map.put("mv", ShellVerbs::moveFile);
-//        map.put("cp", ShellVerbs::copyFile);
-//        map.put("rm", ShellVerbs::deleteFile);
-//        map.put("chmod", ShellVerbs::chmod);
-//        map.put("exec", ShellVerbs::execute);
-//        map.put("chown",ShellVerbs::chown);
-//        map.put("bgjobs", ShellVerbs::showBackgroundJobs);
-//        map.put("killjob", ShellVerbs::killBackgroundJobs);
-//        map.put("create", ShellVerbs::createFile);
-//        map.put("display", ShellVerbs::displayFile);
-//
-//    }
+/*
+    The main driver function of the shell. It displays the prompt
+    and accepts input from the user, which is then passed to
+    InternalFunctions.executeCommands().
+ */
 
 
     public static void main(String[] args) {
@@ -38,7 +23,7 @@ public class Main {
         Scanner scanner = new Scanner(new BufferedReader(new InputStreamReader(System.in)));
         InternalState.setScanner(scanner);
         while(true) {
-            System.out.print(Colour.BLACK + InternalState.getInstance().getPresentWorkingDirectory().toString() + Colour.RESET + " >> ");
+            System.out.print(Colour.BLUE + InternalState.getInstance().getPresentWorkingDirectory().toString() + Colour.RESET + " >> ");
             try {
                 String input = scanner.nextLine().trim();
                 if(!input.equals("")) {

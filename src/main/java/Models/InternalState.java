@@ -13,6 +13,13 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Scanner;
 
+/*
+        jobTable stores details of all background jobs
+        commandHistory stores details of last 9 commands
+        map stores the names of all available commands and their corresponding functions in ShellVerb
+        presentWorkingDirectory stores the present working directory
+        reader stores the current Scanner object
+*/
 public class InternalState {
     private static InternalState instance = null;
 
