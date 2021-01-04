@@ -1,9 +1,11 @@
 package Interfaces;
 
-import java.io.IOException;
-import java.nio.file.Path;
+/*
+    Defines the interface which each command
+    implementation must follow
+ */
+
 import java.util.ArrayList;
-import java.util.List;
 
 public interface VerbMapFunction {
     Object call(ArrayList<String> parameters, ArrayList<String> arguments) throws Exception;

@@ -15,23 +15,21 @@ import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-/**
- *  All the shell functions go here I guess
- *
- *  Note:-
- *  1.  The list function works fine
- *  2. The copy and move functions will delete the destination folder and file(duh) if it exists, Need to modify it such that
- *      it overwrites only contents in destination that match/exist
- *  3. Rest of the Code not tested at the moment
+/*
+    Contains the implementations for each command
+    available in the shell.
  */
-
 public class ShellVerbs {
 
     static POSIX posixFns = Native.load("c",POSIX.class);
 
+    /*
+        clear : Clears the screen.
+
+            parameters - None
+            arguments - None
+     */
     public static Object clearScreen(ArrayList<String> parameters, ArrayList<String> arguments) {
-        //Doesn't work in IntelliJ's console but
-        //it should work in a regular cmd window
         /*
             Windows version of this code, no longer used
             try{
@@ -44,6 +42,12 @@ public class ShellVerbs {
         return null;
     }
 
+    /*
+        pwd: Prints the present working directory to console.
+
+            parameters - None
+            arguments - None
+     */
     public static Object presentWorkingDirectory(ArrayList<String> parameters, ArrayList<String> arguments) {
         System.out.println(Colour.GREEN
                 + InternalState.getInstance().getPresentWorkingDirectory().toString()
@@ -51,6 +55,14 @@ public class ShellVerbs {
         return null;
     }
 
+    /*
+        cd: Changes directory to the path specified as an argument.
+
+            parameters - None
+            arguments - Any valid relative / absolute path. If a path contains
+                        spaces, then that path must be enclosed in double
+                        quotes (").
+     */
     public static Object changeDirectory(ArrayList<String> parameters, ArrayList<String> arguments){
         if(arguments == null || arguments.size() == 0 || arguments.get(0).equals("."))
             return null;
@@ -82,23 +94,24 @@ public class ShellVerbs {
         return null;
     }
 
+    /*
+        ls: Lists all files in the path specified. If no path
+            specified, it displays all files in the present
+            working directory. If a path contains spaces, then
+            that path must be enclosed in double quotes (").
+
+            parameters - a to display hidden files.
+                         l to display extra information about
+                         each file.
+     */
     public static Object listFiles(ArrayList<String> parameters, ArrayList<String> arguments) throws IOException {
         Path path;
-//        if(arguments.get(0).length() == 0 || arguments.get(0).equals(".")){
-////            arguments.get(0) = InternalState.getInstance().getPresentWorkingDirectory().toString();
-//            arguments.set(0, InternalState.getInstance().getPresentWorkingDirectory().toString());
-//        }
+
         if(arguments.size() == 0)
             path = InternalState.getInstance().getPresentWorkingDirectory();
         else
             path = InternalFunctions.getPath(arguments.get(0));
 
-//        else {
-//            if(values[0].charAt(0) != '/') {
-//                values[0] = InternalState.getInstance().getPresentWorkingDirectory().toString() + "/" + values[0];
-//            }
-//            path = Paths.get(values[0]);
-//        }
         HashSet<Character> params = new HashSet<>();
         String paramString = parameters.size() != 0 ? parameters.get(0) : "";
         for(int i=0; i < paramString.length(); i++)
@@ -111,6 +124,16 @@ public class ShellVerbs {
         return null;
     }
 
+    /*
+        cp: Copies file/directory from source to destination.
+
+            parameters - i to be prompted before overwriting a file
+                         or directory with the same name.
+            arguments - Source path followed by destination path. They
+                        can be relative or absolute. If a path contains
+                        spaces, then that path must be enclosed in double
+                        quotes (").
+     */
     public static Object copyFile(ArrayList<String> parameters, ArrayList<String> arguments) throws IOException{
         if(arguments.get(0).equals("")) return null;
         String sourceFilePath = arguments.get(0), destinationFilePath = arguments.get(1);
@@ -159,6 +182,16 @@ public class ShellVerbs {
         return null;
     }
 
+    /*
+        mv: Moves file/directory from source path to the destination path.
+
+            parameters - i to be prompted before overwriting a file
+                         or directory with the same name.
+            arguments - Source path followed by destination path. They
+                        can be relative or absolute. If a path contains
+                        spaces, then that path must be enclosed in double
+                        quotes (").
+     */
     public static Object moveFile(ArrayList<String> parameters, ArrayList<String> arguments) throws IOException{
         if(arguments.get(0).equals("")) return null;
         String sourceFilePath = arguments.get(0), destinationFilePath = arguments.get(1);
@@ -205,6 +238,16 @@ public class ShellVerbs {
         return null;
     }
 
+    /*
+        rm - Deletes file/folder specified by the path.
+
+            Parameters - r for recursive delete. Without this
+                         parameter, non empty directories won't
+                         be deleted.
+            Arguments - Relative/absolute path to the file/directory
+                        to be deleted. If a path contains spaces, then
+                        that path must be enclosed in double quotes (").
+     */
     public static Void deleteFile(ArrayList<String> parameters, ArrayList<String> arguments) throws IOException{
         HashSet<Character> params = new HashSet<>();
         String paramString = parameters.size() != 0 ? parameters.get(0) : "";
@@ -228,6 +271,16 @@ public class ShellVerbs {
         return null;
     }
 
+    /*
+        chmod - Change permissions of a file/directory specified by the path
+
+            Parameters - (+/-)(r/w/x)
+                            +/- implies add/remove
+                            r/w/x means read, write and execute
+            Arguments - A valid relative/absolute path to the file. If a
+                        path contains spaces, then that path must be
+                        enclosed in double quotes (").
+     */
     public static Void chmod(ArrayList<String> parameters, ArrayList<String> arguments) throws IOException{
 
         if(arguments.size() == 0){
@@ -315,6 +368,14 @@ public class ShellVerbs {
         return null;
     }
 
+    /*
+        chown - Changes ownership of the file/directory specified by the path.
+
+            Parameters -
+            Arguments - A valid relative/absolute path to the file. If a
+                        path contains spaces, then that path must be
+                        enclosed in double quotes (").
+     */
     public static Void chown(ArrayList<String> parameters, ArrayList<String> arguments) throws IOException{
 
         if(arguments.size() != 2){
@@ -387,6 +448,16 @@ public class ShellVerbs {
         return null;
     }
 
+    /*
+        exec - Execute a command on the parent bash shell
+
+        Parameters - c to capture console output as a String for
+                     future use
+                     b to run the command in the background
+        Arguments - Strings in quotes containing the command name,
+                    the options, and the arguments. One string mentioning
+                    the command is mandatory.
+     */
     public static String execute(ArrayList<String> parameters, ArrayList<String> arguments) throws Exception {
         boolean shouldCapture = false, shouldRunInBackground = false;
         if(parameters.size() > 0 && parameters.get(0).charAt(1) == 'c') shouldCapture = true;

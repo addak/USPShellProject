@@ -15,8 +15,14 @@ import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+/*
+    Contains functions that are common between multiple
+    commands
+ */
+
 public class InternalFunctions {
 
+    //Generates output for ls command according to parameters passed
     public static void lsParam(Path p, HashSet<Character> args) throws IOException {
 
         if(!args.contains('a') && Files.isHidden(p))
@@ -30,7 +36,7 @@ public class InternalFunctions {
             SimpleDateFormat formatter = new SimpleDateFormat("MMM dd hh:mm:ss");
             String lastModTime = formatter.format(new Date(filesAttributes.lastModifiedTime().toMillis()));
 
-            outputBuilder.append(String.format("%-6d %-16s ", filesAttributes.size(), lastModTime));
+            outputBuilder.append(String.format("%-10d %-16s ", filesAttributes.size(), lastModTime));
         }
 
         if(Files.isRegularFile(p))
@@ -42,6 +48,7 @@ public class InternalFunctions {
 
     }
 
+    //Recursively copies file/folder from source to destination
     public static void recursiveCopy(Path srcPath, Path desPath) throws IOException {
 
         if(Files.isDirectory(srcPath)){
@@ -69,6 +76,7 @@ public class InternalFunctions {
         }
     }
 
+    //Recursively moves file/folder from source to destination
     public static void recursiveMove(Path srcPath, Path desPath) throws IOException{
 
         if(Files.isDirectory(srcPath)){
@@ -96,6 +104,7 @@ public class InternalFunctions {
         }
     }
 
+    //Recursively deletes file/folder from source to destination
     public static void recursiveDelete(Path path) throws IOException{
         if(Files.isDirectory(path)) {
             List<Path> paths = Files.list(path).collect(Collectors.toList());
@@ -111,6 +120,7 @@ public class InternalFunctions {
         } else if (Files.isRegularFile(path)) Files.delete(path);
     }
 
+    //Returns absolute path for any given path
     public static Path getPath(String pathString){
 
         String absPath = "";
@@ -149,6 +159,12 @@ public class InternalFunctions {
         return Paths.get(absPath);
     }
 
+    /*
+        Responsible for executing commands and piping
+        output from one command to another. This is also
+        used by history command hence it's a separate function
+        instead of just being part of the main method.
+     */
     public static void executeCommands(ArrayList<ParserOutput> parserOutput) throws Exception{
         ParserOutput output = parserOutput.get(0);
         String commandOutput = null;

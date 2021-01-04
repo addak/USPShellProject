@@ -1,5 +1,10 @@
 package Models;
 
+/*
+    This class is used to store details of
+    background jobs
+ */
+
 public class JobTableEntry {
 
     private String fullCommand;

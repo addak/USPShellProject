@@ -1,5 +1,10 @@
 package Models;
 
+/*
+    This class is used to store command history in
+    InternalState.
+ */
+
 import Parser.ParserOutput;
 
 import java.util.ArrayList;
