@@ -36,6 +36,8 @@ public class InternalState {
         map.put("create", ShellVerbs::createFile);
         map.put("display", ShellVerbs::displayFile);
         map.put("history", ShellVerbs::commandHistory);
+        map.put("unravel",ShellVerbs::unravel);
+        map.put("ravel",ShellVerbs::ravel);
     }
 
     private InternalState() {

@@ -5,11 +5,12 @@
       <list>
         <PerGrammarGenerationSettings>
           <option name="fileName" value="$PROJECT_DIR$/src/main/java/Shell.g4" />
-          <option name="outputDir" value="$USER_HOME$/Parser/" />
+          <option name="autoGen" value="true" />
+          <option name="outputDir" value="$PROJECT_DIR$/src/main/java/ParserBack" />
           <option name="libDir" value="" />
           <option name="encoding" value="" />
-          <option name="pkg" value="Parser" />
-          <option name="language" value="Java" />
+          <option name="pkg" value="" />
+          <option name="language" value="" />
         </PerGrammarGenerationSettings>
       </list>
     </option>

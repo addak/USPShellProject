@@ -2,6 +2,8 @@ package HelperClasses;
 
 import Parser.*;
 import com.sun.jna.Native;
+import org.rauschig.jarchivelib.Archiver;
+import org.rauschig.jarchivelib.ArchiverFactory;
 
 import java.io.*;
 import java.nio.file.*;
@@ -391,7 +393,7 @@ public class ShellVerbs {
         String[] command = new String[arguments.size()]; int i = 0;
         for(String argument: arguments) {
             command[i++] = argument;
-            fullCommand.append(argument + " ");
+            fullCommand.append(argument).append(" ");
         }
 
         ProcessBuilder processBuilder = new ProcessBuilder()
@@ -425,7 +427,7 @@ public class ShellVerbs {
         }
     }
 
-    public static Void showBackgroundJobs(ArrayList<String> parameters, ArrayList<String> arguments) throws Exception{
+    public static Void showBackgroundJobs(ArrayList<String> parameters, ArrayList<String> arguments) {
         HashMap<Long, JobTableEntry> jobTable = InternalState.getInstance().getJobTable();
         if(arguments.size() == 0) {
             System.out.println("Current background jobs: ");
@@ -454,7 +456,7 @@ public class ShellVerbs {
         return null;
     }
 
-    public static Void killBackgroundJobs (ArrayList<String> parameters, ArrayList<String> arguments) throws Exception {
+    public static Void killBackgroundJobs (ArrayList<String> parameters, ArrayList<String> arguments){
         if(arguments.size() > 0) {
             HashMap<Long, JobTableEntry> jobTable = InternalState.getInstance().getJobTable();
             if(arguments.get(0).charAt(0) == '*') {
@@ -578,6 +580,69 @@ public class ShellVerbs {
                 System.out.println(Colour.RED + "history: invalid index" + Colour.RESET);
             }
         }
+        return null;
+    }
+
+    public static Void ravel(ArrayList<String> parameters, ArrayList<String> arguments) throws IOException{
+
+        if(arguments.size() != 2){
+            System.out.println(Colour.RED + "Invalid no. of args" +Colour.RESET);
+            return null;
+        }
+
+        Path srcFile =  InternalFunctions.getPath(arguments.get(0));
+        Path desFile = InternalFunctions.getPath(arguments.get(1));
+
+        if(!Files.exists(srcFile)){
+            System.out.println(Colour.RED + "Source File doesn't exist" + Colour.RESET);
+            return null;
+        }
+
+        if(Files.exists(desFile)){
+            System.out.print(Colour.YELLOW + "File exists. Should overwrite?[Y/N]: " + Colour.RESET);
+            if(InternalState.getScanner().nextLine().toUpperCase().charAt(0) == 'Y') Files.delete(desFile);
+        }
+        else if(!Files.exists(desFile.getParent()))
+            Files.createDirectories(desFile.getParent());
+
+        Archiver compressor = ArchiverFactory.createArchiver(desFile.toFile());
+        String extension = compressor.getFilenameExtension();
+
+        String archiveName = desFile.getFileName().toString().replace(extension,"");
+
+        compressor.create(archiveName, desFile.getParent().toFile(), srcFile.toFile());
+
+
+        return null;
+    }
+
+    public static Void unravel(ArrayList<String> parameters, ArrayList<String> arguments) throws IOException{
+
+        if(arguments.size() != 2){
+            System.out.println(Colour.RED + "Invalid no. of args" +Colour.RESET);
+            return null;
+        }
+
+        Path srcFile =  InternalFunctions.getPath(arguments.get(0));
+        Path desFile = InternalFunctions.getPath(arguments.get(1));
+
+
+        if(!Files.exists(srcFile)){
+            System.out.println(Colour.RED + "Source File doesn't exist" + Colour.RESET);
+            return null;
+        }
+
+        if(Files.exists(desFile)){
+            System.out.print(Colour.YELLOW + "File exists. Should overwrite?[Y/N]: " + Colour.RESET);
+            if(InternalState.getScanner().nextLine().toUpperCase().charAt(0) == 'Y') Files.delete(desFile);
+        }
+        else if(!Files.exists(desFile.getParent()))
+            Files.createDirectories(desFile.getParent());
+
+        Archiver extractor = ArchiverFactory.createArchiver(srcFile.toFile());
+
+        extractor.extract(srcFile.toFile(), desFile.toFile());
+
         return null;
     }
 
