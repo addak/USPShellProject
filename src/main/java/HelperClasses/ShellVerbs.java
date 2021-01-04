@@ -501,6 +501,13 @@ public class ShellVerbs {
         }
     }
 
+    /*
+        bgjobs - Shows details of all background jobs or only the
+                 ones mentioned
+            Parameters - None
+            Arguments - Valid PID's seperated by spaces. If no PID's are
+                        mentioned then all jobs' info is displayed.
+     */
     public static Void showBackgroundJobs(ArrayList<String> parameters, ArrayList<String> arguments) {
         HashMap<Long, JobTableEntry> jobTable = InternalState.getInstance().getJobTable();
         if(arguments.size() == 0) {
@@ -530,6 +537,14 @@ public class ShellVerbs {
         return null;
     }
 
+    /*
+        kill - Kills the process specified by the PIDs
+
+            Parameters - f to forcefully kill the process (SIGKILL). Default
+                         is to gracefully kill the processes (SIGTERM).
+            Arguments - Valid PIDs separated by spaces or * to kill all background
+                        jobs.
+     */
     public static Void killBackgroundJobs (ArrayList<String> parameters, ArrayList<String> arguments){
         if(arguments.size() > 0) {
             HashMap<Long, JobTableEntry> jobTable = InternalState.getInstance().getJobTable();
@@ -564,6 +579,15 @@ public class ShellVerbs {
         return null;
     }
 
+    /*
+        create - Creates a file with specified text as it's inputs.
+
+            Parameters - f to overwrite already existing file (if present). Default
+                         is to prompt the user before further action.
+            Arguments - A valid relative / absolute path, followed by the content.
+                        If the path / content contains spaces, then that path must
+                        be enclosed in double quotes (").
+     */
     public static Void createFile(ArrayList<String> parameters, ArrayList<String> arguments) throws Exception {
         boolean shouldOverwrite = false;
         Path path;
@@ -600,6 +624,14 @@ public class ShellVerbs {
         return null;
     }
 
+    /*
+        display - Displays the contents of the file at the specified path.
+
+            Parameters - None
+            Arguments - A valid relative / absolute path to the file. If the
+                        path contains spaces, then that path must be enclosed
+                        in double quotes (").
+     */
     public static Void displayFile (ArrayList<String> parameters, ArrayList<String> arguments) throws Exception {
 
         Path path;
@@ -628,6 +660,16 @@ public class ShellVerbs {
 
     }
 
+    /*
+        history - Displays the last 9 commands used. If a number (from 1-9) is
+                  mentioned, the command corresponding to that number will get
+                  executed again.
+
+            Parameters - None
+            Arguments - A number from (1-9) indicating the command to be executed.
+                        A list of the last 9 commands (most recent first) will be
+                        displayed if no arguments are provided.
+     */
     public static Void commandHistory(ArrayList<String> parameters, ArrayList<String> arguments) throws Exception {
         LinkedList<HistoryTableEntry> commandHistory = InternalState.getInstance().getCommandHistory();
         if(arguments.size() == 0) {
