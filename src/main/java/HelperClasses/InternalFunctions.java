@@ -1,8 +1,9 @@
 package HelperClasses;
 
 import Interfaces.VerbMapFunction;
+import Models.Colour;
 import Models.InternalState;
-import Parser.ParserOutput;
+import Models.ParserOutput;
 
 import java.io.File;
 import java.io.IOException;
@@ -168,7 +169,7 @@ public class InternalFunctions {
     public static void executeCommands(ArrayList<ParserOutput> parserOutput) throws Exception{
         ParserOutput output = parserOutput.get(0);
         String commandOutput = null;
-        if(output.getCommand().equals("quit")) return;
+        if(output.getCommand().equals("quit")) System.exit(0);
         else if(output.getCommand().equals("history")) {
             InternalState.getInstance().getCommandHistory().removeFirst();
         }

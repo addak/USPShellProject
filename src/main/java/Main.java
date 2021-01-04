@@ -1,8 +1,9 @@
 import HelperClasses.*;
+import Models.Colour;
 import Models.HistoryTableEntry;
 import Models.InternalState;
 import Parser.Parser;
-import Parser.ParserOutput;
+import Models.ParserOutput;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;

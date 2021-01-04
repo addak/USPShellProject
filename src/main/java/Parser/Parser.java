@@ -1,5 +1,6 @@
 package Parser;
 
+import Models.ParserOutput;
 import Parser.ParserBackend.ShellLexer;
 import Parser.ParserBackend.ShellParser;
 import org.antlr.v4.runtime.ANTLRInputStream;

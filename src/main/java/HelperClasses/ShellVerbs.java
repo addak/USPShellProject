@@ -1,10 +1,12 @@
 package HelperClasses;
 
 import Interfaces.POSIX;
+import Models.Colour;
 import Models.HistoryTableEntry;
 import Models.InternalState;
 import Models.JobTableEntry;
 import com.sun.jna.Native;
+import org.rauschig.jarchivelib.ArchiveFormat;
 import org.rauschig.jarchivelib.Archiver;
 import org.rauschig.jarchivelib.ArchiverFactory;
 

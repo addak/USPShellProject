@@ -5,8 +5,6 @@ package Models;
     InternalState.
  */
 
-import Parser.ParserOutput;
-
 import java.util.ArrayList;
 
 public class HistoryTableEntry {

@@ -1,4 +1,4 @@
-package Parser;
+package Models;
 
 /*
     Presents the output of the parser
