@@ -646,4 +646,24 @@ public class ShellVerbs {
         return null;
     }
 
+    public static Void mkdir(ArrayList<String> parameters, ArrayList<String> arguments) throws IOException{
+
+        if(arguments.size() == 0){
+            System.out.println(Colour.RED + "Invalid no of args");
+        }
+
+        Path directoryPath = InternalFunctions.getPath(arguments.get(0));
+
+        if(Files.exists(directoryPath))
+            return null;
+
+        if(parameters.size() != 0 && parameters.get(0).equals("-p")){
+            Files.createDirectories(directoryPath);
+        }
+        else{
+            Files.createDirectory(directoryPath);
+        }
+        return null;
+    }
+
 }

@@ -38,6 +38,7 @@ public class InternalState {
         map.put("history", ShellVerbs::commandHistory);
         map.put("unravel",ShellVerbs::unravel);
         map.put("ravel",ShellVerbs::ravel);
+        map.put("mkdir", ShellVerbs::mkdir);
     }
 
     private InternalState() {

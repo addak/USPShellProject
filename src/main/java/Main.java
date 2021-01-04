@@ -38,7 +38,7 @@ public class Main {
         Scanner scanner = new Scanner(new BufferedReader(new InputStreamReader(System.in)));
         InternalState.setScanner(scanner);
         while(true) {
-            System.out.print(">> ");
+            System.out.print(Colour.BLACK + InternalState.getInstance().getPresentWorkingDirectory().toString() + Colour.RESET + " >> ");
             try {
                 String input = scanner.nextLine().trim();
                 if(!input.equals("")) {
@@ -48,7 +48,7 @@ public class Main {
                     InternalFunctions.executeCommands(parserOutput);
                 }
             } catch (Exception e) {
-                System.out.println(Colour.RED + "Shell error: " + e.getMessage() + Colour.RESET);
+                System.out.println(Colour.RED + "Shell error: " + e + Colour.RESET);
             }
         }
 
