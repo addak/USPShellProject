@@ -156,13 +156,14 @@ public class ShellVerbs {
             Path parent = destinationFile.getParent();
 
             if(Files.exists(destinationFile)){
-                if(params.contains('i'))
+                if(params.contains('i')) {
                     System.out.println("Destination exists already. Do you wish to overwrite it? (Y/N)");
-                String decision = InternalState.getScanner().nextLine().toUpperCase();
+                    String decision = InternalState.getScanner().nextLine().toUpperCase();
 
-                if(decision.equals("Y")){
-                    InternalFunctions.recursiveDelete(destinationFile);
-                    InternalFunctions.recursiveCopy(sourceFile, destinationFile);
+                    if (decision.equals("Y")) {
+                        InternalFunctions.recursiveDelete(destinationFile);
+                        InternalFunctions.recursiveCopy(sourceFile, destinationFile);
+                    }
                 }
             }
             else{
@@ -214,13 +215,14 @@ public class ShellVerbs {
             Path parent = destinationFile.getParent();
 
             if(Files.exists(destinationFile)){
-                if(params.contains('i'))
+                if(params.contains('i')) {
                     System.out.println("Destination already exists. Do you wish to overwrite it? (Y/N)");
-                String decision = InternalState.getScanner().nextLine().toUpperCase();
+                    String decision = InternalState.getScanner().nextLine().toUpperCase();
 
-                if(decision.equals("Y")){
-                    InternalFunctions.recursiveDelete(destinationFile);
-                    InternalFunctions.recursiveMove(sourceFile, destinationFile);
+                    if (decision.equals("Y")) {
+                        InternalFunctions.recursiveDelete(destinationFile);
+                        InternalFunctions.recursiveMove(sourceFile, destinationFile);
+                    }
                 }
             }
             else{
@@ -371,7 +373,12 @@ public class ShellVerbs {
     /*
         chown - Changes ownership of the file/directory specified by the path.
 
-            Parameters -
+            Parameters - USERNAME           - Change user ownership of file to username
+                         USERNAME:          - Change user & group ownership to username
+                         :GROUPNAME         - Change group ownership to groupname
+                         USERNAME:GROUPNAME - Change user & group ownership to username and groupname respectively
+                         where USERNAME & GROUPNAME are valid names in the system
+
             Arguments - A valid relative/absolute path to the file. If a
                         path contains spaces, then that path must be
                         enclosed in double quotes (").
@@ -657,6 +664,16 @@ public class ShellVerbs {
         return null;
     }
 
+    /*
+        ravel - Function that handles compression of files/folders
+
+            Parameters - None
+
+            Arguments  - 2 valid relative/absolute path to the file.
+                         A source file path (to be compressed) and the destination path of the compressed file
+
+                 Note : If a path contains spaces, then that path must be enclosed in double quotes (").
+     */
     public static Void ravel(ArrayList<String> parameters, ArrayList<String> arguments) throws IOException{
 
         if(arguments.size() != 2){
@@ -690,6 +707,16 @@ public class ShellVerbs {
         return null;
     }
 
+    /*
+        unravel - Function that handles decompression of files/folders
+
+            Parameters - None
+
+            Arguments  - 2 valid relative/absolute path to the file.
+                         A source file path (to be decompressed) and the destination path of the decompressed contents
+
+                 Note : If a path contains spaces, then that path must be enclosed in double quotes (").
+     */
     public static Void unravel(ArrayList<String> parameters, ArrayList<String> arguments) throws IOException{
 
         if(arguments.size() != 2){
