@@ -1,4 +1,4 @@
-package HelperClasses;
+package Models;
 
 public class JobTableEntry {
 

@@ -1,5 +1,7 @@
 package HelperClasses;
 
+import Interfaces.VerbMapFunction;
+import Models.InternalState;
 import Parser.ParserOutput;
 
 import java.io.File;

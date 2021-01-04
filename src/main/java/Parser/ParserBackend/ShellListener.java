@@ -1,4 +1,4 @@
-package ParserBackend;// Generated from /home/addak/Java/Java Projects/USPShellProject/src/main/java/Shell.g4 by ANTLR 4.9
+package Parser.ParserBackend;// Generated from /home/addak/Java/Java Projects/USPShellProject/src/main/java/Shell.g4 by ANTLR 4.9
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 /**

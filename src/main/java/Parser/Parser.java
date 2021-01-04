@@ -1,7 +1,7 @@
 package Parser;
 
-import ParserBackend.ShellLexer;
-import ParserBackend.ShellParser;
+import Parser.ParserBackend.ShellLexer;
+import Parser.ParserBackend.ShellParser;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;

@@ -1,8 +1,11 @@
-package HelperClasses;
+package Models;
 
 /*
     Things that need to be accessible globally go here
  */
+
+import HelperClasses.ShellVerbs;
+import Interfaces.VerbMapFunction;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -15,7 +18,7 @@ public class InternalState {
 
     private HashMap<Long, JobTableEntry> jobTable;
     private LinkedList<HistoryTableEntry> commandHistory;
-    private static HashMap<String,VerbMapFunction> map = new HashMap<>();
+    private static HashMap<String, VerbMapFunction> map = new HashMap<>();
 
     private Path presentWorkingDirectory;
     private static Scanner reader;

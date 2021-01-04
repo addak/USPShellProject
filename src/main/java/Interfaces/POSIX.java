@@ -1,4 +1,4 @@
-package HelperClasses;
+package Interfaces;
 
 import com.sun.jna.*;
 
