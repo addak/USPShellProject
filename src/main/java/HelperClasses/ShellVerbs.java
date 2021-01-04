@@ -747,6 +747,16 @@ public class ShellVerbs {
         return null;
     }
 
+    /*
+        mkdir - Function that handles directory creation
+
+            Parameters - -p for recursive directory creation
+                          i.e in case the parent & ancestor directories don't exist
+
+            Arguments  - A valid relative/absolute path for directory creation.
+
+                 Note : If a path contains spaces, then that path must be enclosed in double quotes (").
+     */
     public static Void mkdir(ArrayList<String> parameters, ArrayList<String> arguments) throws IOException{
 
         if(arguments.size() == 0){
